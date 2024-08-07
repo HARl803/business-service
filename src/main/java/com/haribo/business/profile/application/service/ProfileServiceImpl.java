@@ -2,6 +2,7 @@ package com.haribo.business.profile.application.service;
 
 import com.haribo.business.common.exception.CustomErrorCode;
 import com.haribo.business.common.exception.CustomException;
+import com.haribo.business.profile.application.dto.MentoInfo;
 import com.haribo.business.profile.application.dto.MentoNDto;
 import com.haribo.business.profile.application.dto.MentoRDto;
 import com.haribo.business.profile.application.dto.ProfileRDto;
@@ -23,6 +24,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -130,5 +134,37 @@ public class ProfileServiceImpl implements ProfileService{
                 .build();
     }
 
+    @Override
+    public List<Map<String, MentoInfo>> getMentoList() {
 
+        List<Map<String, MentoInfo>> allMentoList = new ArrayList<>();
+
+        List<MentoRDto> MentoRDtoRList = mentoRepository.findAll();
+        ;
+        for(MentoRDto mentoRDto : MentoRDtoRList){
+            String profileId = mentoRDto.getProfileId();
+            logger.debug("profileId: {}", profileId);
+
+            ProfileRDto profileRDto = profileRepository.findByProfileId(profileId);
+
+            String matchingRate;
+            if(mentoRDto.getTotalCnt()==0) matchingRate = "매칭 시도 횟수가 한 번도 없어여!";
+            else matchingRate = (double)mentoRDto.getMatchingRate()/ mentoRDto.getTotalCnt() +"%";
+
+            List<Integer> techs = mongoTemplate.findOne(new Query().addCriteria(Criteria.where("profile_id").is(profileId)), MentoNDto.class).getTechs();
+
+            Map<String, MentoInfo> tmpMentoMap = new HashMap<>();
+            MentoInfo mentoInfo = MentoInfo.builder()
+                    .intro(profileRDto.getIntro())
+                    .matchingRate(matchingRate)
+                    .nickName(profileRDto.getNickName())
+                    .techs(techs)
+                    .build();
+            tmpMentoMap.put(profileId, mentoInfo);
+
+            allMentoList.add(tmpMentoMap);
+        }
+
+        return allMentoList;
+    }
 }

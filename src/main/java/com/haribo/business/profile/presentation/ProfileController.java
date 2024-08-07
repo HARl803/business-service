@@ -35,4 +35,12 @@ public class ProfileController {
 
         return ResponseEntity.status(HttpStatus.OK).body(profileService.registMento(mentoRequest));
     }
+
+    @GetMapping
+    public ResponseEntity<?> getAllMento() {
+
+        return ResponseEntity.status(HttpStatus.OK).body(profileService.getMentoList());
+    }
+
+
 }
