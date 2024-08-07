@@ -1,6 +1,7 @@
 package com.haribo.business.profile.presentation;
 
 import com.haribo.business.profile.application.service.ProfileService;
+import com.haribo.business.profile.presentation.request.ProfileUpdateRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,5 +20,13 @@ public class ProfileController {
     public ResponseEntity<?> getProfile(@PathVariable String profileId) {
 
         return ResponseEntity.status(HttpStatus.OK).body(profileService.getProfile(profileId));
+    }
+
+    @PatchMapping
+    public ResponseEntity<?> updateProfile(@RequestBody ProfileUpdateRequest profileUpdateRequest) {
+
+        profileService.updateProfile(profileUpdateRequest);
+
+        return ResponseEntity.status(HttpStatus.OK).body("업데이트 완료");
     }
 }

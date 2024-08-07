@@ -5,7 +5,9 @@ import com.haribo.business.common.exception.CustomException;
 import com.haribo.business.profile.application.dto.MentoNDto;
 import com.haribo.business.profile.application.dto.ProfileRDto;
 import com.haribo.business.profile.domain.repository.ProfileRepository;
+import com.haribo.business.profile.presentation.request.ProfileUpdateRequest;
 import com.haribo.business.profile.presentation.response.ProfileResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -43,5 +45,28 @@ public class ProfileServiceImpl implements ProfileService{
         }
 
         return null;
+    }
+
+    @Override
+    @Transactional
+    public void updateProfile(ProfileUpdateRequest profileUpdateRequest) {
+        ProfileRDto profileRDto = profileRepository.findByProfileId(profileUpdateRequest.getProfileId());
+
+        if(profileRDto==null) throw new CustomException(CustomErrorCode.USER_NOT_FOUND);
+
+        profileRDto = ProfileRDto.builder()
+                .profileId(profileRDto.getProfileId())
+                .memberId(profileRDto.getMemberId())
+                .email(profileRDto.getEmail())
+                .name(profileRDto.getName())
+                .status(profileRDto.getStatus())
+                .nickName(profileUpdateRequest.getNickName())
+                .profileImg(profileUpdateRequest.getProfileImg())
+                .simpleIntroduce(profileUpdateRequest.getIntro())
+                .build();
+
+        logger.debug("업데이트 할 profileRDto: {}", profileRDto);
+
+        profileRepository.save(profileRDto);
     }
 }

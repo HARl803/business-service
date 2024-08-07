@@ -30,14 +30,17 @@ public class ProfileRDto {
     private String nickName;
 
     @Column(name = "simple_introduce")
+    @NotNull
     private String simpleIntroduce;
 
     @Column(name = "email")
+    @NotNull
     private String email;
 
     @Column(name = "profile_img")
     private String profileImg;
 
     @Column(name = "status")
+    @NotNull
     private String status;
 }
