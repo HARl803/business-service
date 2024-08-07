@@ -146,11 +146,6 @@ public class ProfileServiceImpl implements ProfileService{
                         .build()
         );
 
-        // times 로직 -> 들어온 시간 모두 비트 연산으로 or 연산해서 합산 한 값
-        // 프론트에서 처리해서 주는거겠지,,?
-        // 만약 그렇다면 난 DB에 저장만 하면 됨..
-        /////////
-
         mongoTemplate.save(
                 MentoNDto.builder()
                         .profileId(profileId)
@@ -238,11 +233,6 @@ public class ProfileServiceImpl implements ProfileService{
         Query query = new Query(Criteria.where("profile_id").is(profileId));
 
         MentoNDto mentoNDto = mongoTemplate.findOne(query, MentoNDto.class);
-
-        // times 로직 -> 들어온 시간 모두 비트 연산으로 or 연산해서 합산 한 값
-        // 프론트에서 처리해서 주는거겠지,,?
-        // 만약 그렇다면 난 DB에 저장만 하면 됨..
-        /////////
 
         MentoNDto tmpMentoDto = MentoNDto
                 .builder()
