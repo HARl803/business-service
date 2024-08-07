@@ -1,6 +1,7 @@
 package com.haribo.business.profile.presentation;
 
 import com.haribo.business.profile.application.service.ProfileService;
+import com.haribo.business.profile.presentation.request.MentoRequest;
 import com.haribo.business.profile.presentation.request.ProfileUpdateRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,6 @@ public class ProfileController {
     @Autowired
     private ProfileService profileService;
 
-    /// 일반 유저 인원 컨트롤러
     @GetMapping("/{profileId}")
     public ResponseEntity<?> getProfile(@PathVariable String profileId) {
 
@@ -28,5 +28,11 @@ public class ProfileController {
         profileService.updateProfile(profileUpdateRequest);
 
         return ResponseEntity.status(HttpStatus.OK).body("업데이트 완료");
+    }
+
+    @PostMapping
+    public ResponseEntity<?> registMento(@RequestBody MentoRequest mentoRequest) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(profileService.registMento(mentoRequest));
     }
 }

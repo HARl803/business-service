@@ -31,7 +31,7 @@ public class ProfileRDto {
 
     @Column(name = "simple_introduce")
     @NotNull
-    private String simpleIntroduce;
+    private String intro;
 
     @Column(name = "email")
     @NotNull
