@@ -1,5 +1,7 @@
 package com.haribo.business.profile.application.service;
 
-public interface ProfileService {
+import com.haribo.business.profile.presentation.response.ProfileResponse;
 
+public interface ProfileService {
+    ProfileResponse getProfile(String profileId);
 }
