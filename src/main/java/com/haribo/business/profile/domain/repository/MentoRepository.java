@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface MentoRepository extends JpaRepository<MentoRDto, String> {
 
     boolean existsByProfileId(String profileId);
+    MentoRDto findByProfileId(String profileId);
 }

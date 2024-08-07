@@ -14,4 +14,5 @@ public interface ProfileService {
 
     ProfileResponse registMento(MentoRequest mentoRequest);
     List<Map<String, MentoInfo>> getMentoList();
+    void updateMento(MentoRequest mentoRequest);
 }

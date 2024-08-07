@@ -42,5 +42,11 @@ public class ProfileController {
         return ResponseEntity.status(HttpStatus.OK).body(profileService.getMentoList());
     }
 
+    @PatchMapping("/mento")
+    public ResponseEntity<?> updateMento(@RequestBody MentoRequest mentoRequest) {
+        profileService.updateMento(mentoRequest);
+
+        return ResponseEntity.status(HttpStatus.OK).body("업데이트 완료");
+    }
 
 }

@@ -167,4 +167,52 @@ public class ProfileServiceImpl implements ProfileService{
 
         return allMentoList;
     }
+
+    @Override
+    @Transactional
+    public void updateMento(MentoRequest mentoRequest) {
+
+        String profileId = mentoRequest.getProfileId();
+        ProfileRDto profileRDto = profileRepository.findByProfileId(profileId);
+
+        if(profileRDto==null) throw new CustomException(CustomErrorCode.USER_NOT_FOUND);
+
+        MentoRDto mentoRDto = mentoRepository.findByProfileId(profileId);
+
+        if(mentoRDto==null) throw new CustomException(CustomErrorCode.USER_NOT_MENTO);
+
+        if(mentoRequest.getTechs().size()>5)
+            throw new CustomException(CustomErrorCode.SIZE_FULL_ERROR);
+
+        mentoRepository.save(
+                MentoRDto.builder()
+                        .mentoId(mentoRDto.getMentoId())
+                        .description(mentoRequest.getDescription())
+                        .profileId(profileId)
+                        .matchingRate(0)
+                        .totalCnt(0)
+                        .build()
+        );
+
+        Query query = new Query(Criteria.where("profile_id").is(profileId));
+
+        MentoNDto mentoNDto = mongoTemplate.findOne(query, MentoNDto.class);
+
+        // times 로직 -> 들어온 시간 모두 비트 연산으로 or 연산해서 합산 한 값
+        // 프론트에서 처리해서 주는거겠지,,?
+        // 만약 그렇다면 난 DB에 저장만 하면 됨..
+        /////////
+
+        MentoNDto tmpMentoDto = MentoNDto
+                .builder()
+                .id(mentoNDto.getId())
+                .profileId(profileId)
+                .times(mentoRequest.getTimes())
+                .techs(mentoRequest.getTechs())
+                .questions(mentoRequest.getQuestions())
+                .build();
+
+        mongoTemplate.save(tmpMentoDto);
+    }
+
 }
