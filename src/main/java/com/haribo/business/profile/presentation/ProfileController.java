@@ -3,6 +3,7 @@ package com.haribo.business.profile.presentation;
 import com.haribo.business.profile.application.service.ProfileService;
 import com.haribo.business.profile.presentation.request.MentoRequest;
 import com.haribo.business.profile.presentation.request.ProfileUpdateRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,10 +11,10 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/profile")
 public class ProfileController {
 
-    @Autowired
     private ProfileService profileService;
 
     @GetMapping("/{profileId}")

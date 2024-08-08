@@ -29,13 +29,11 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService{
 
-    @Autowired
     private final ProfileRepository profileRepository;
     private final MongoTemplate mongoTemplate;
     private final MentoRepository mentoRepository;
     private final ReservationRepository reservationRepository;
 
-    private final Logger logger = LoggerFactory.getLogger(ProfileServiceImpl.class);
 
     @Override
     public ProfileResponse getProfile(String profileId) {
@@ -55,13 +53,13 @@ public class ProfileServiceImpl implements ProfileService{
         MentoRDto mentoRDto = mentoRepository.findByProfileId(profileRDto.getProfileId());
 
         List<ReservationNDto> allReservation = mongoTemplate.findAll(ReservationNDto.class);
-        logger.debug("reservation size: {}", allReservation.size());
+        log.debug("reservation size: {}", allReservation.size());
 
         List<ReviewResponse> reviewList = new ArrayList<>();
 
         for(ReservationNDto reservationNDto : allReservation) {
             LinkedHashMap<String, Object> reservation = (LinkedHashMap<String, Object>) reservationNDto.getReservation();
-            logger.debug("reservation: {}", reservation);
+            log.debug("reservation: {}", reservation);
 
             String key = (String) reservation.keySet().toArray()[0];
 
@@ -117,7 +115,7 @@ public class ProfileServiceImpl implements ProfileService{
                 .intro(profileUpdateRequest.getIntro())
                 .build();
 
-        logger.debug("업데이트 할 profileRDto: {}", profileRDto);
+        log.debug("업데이트 할 profileRDto: {}", profileRDto);
 
         profileRepository.save(profileRDto);
     }
@@ -155,7 +153,7 @@ public class ProfileServiceImpl implements ProfileService{
                         .build()
         );
 
-        logger.debug("멘토 등록 완료: {}", mentoRequest);
+        log.debug("멘토 등록 완료: {}", mentoRequest);
 
         return MentoProfileResponse.builder()
                 .nickName(profileRDto.getNickName())
@@ -179,7 +177,7 @@ public class ProfileServiceImpl implements ProfileService{
         ;
         for(MentoRDto mentoRDto : MentoRDtoRList){
             String profileId = mentoRDto.getProfileId();
-            logger.debug("profileId: {}", profileId);
+            log.debug("profileId: {}", profileId);
 
             ProfileRDto profileRDto = profileRepository.findByProfileId(profileId);
 
