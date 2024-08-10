@@ -26,12 +26,4 @@ public class MentoRDto {
     @Column(name = "introduce")
     @NotNull
     private String description;
-
-    @Column(name = "total_cnt")
-    @NotNull
-    private int totalCnt;
-
-    @Column(name = "matching_rate")
-    @NotNull
-    private int matchingRate;
 }
