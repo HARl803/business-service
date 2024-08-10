@@ -1,5 +1,6 @@
 package com.haribo.business.profile.application.dto;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,10 +24,15 @@ public class MentoNDto {
     @Field("profile_id")
     private String profileId;
 
+    private int totalCnt;
+
+    private int matchingRate;
+
+    private long star;
+
     private List<Long> times;
 
     private List<Integer> techs;
 
     private List<String> questions;
-
 }
