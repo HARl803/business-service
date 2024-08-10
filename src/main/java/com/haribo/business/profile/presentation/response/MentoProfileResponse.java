@@ -14,6 +14,8 @@ public class MentoProfileResponse extends ProfileResponse {
 
     private String matchingRate;
 
+    private String star;
+
     private List<Long> times;
 
     private List<Integer> techs;
