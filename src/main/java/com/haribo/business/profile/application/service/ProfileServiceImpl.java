@@ -6,22 +6,23 @@ import com.haribo.business.profile.application.dto.*;
 import com.haribo.business.profile.domain.repository.MentoRepository;
 import com.haribo.business.profile.domain.repository.ProfileRepository;
 import com.haribo.business.profile.domain.repository.ReservationRepository;
+import com.haribo.business.profile.presentation.request.MentoMatchingRequest;
 import com.haribo.business.profile.presentation.request.MentoRequest;
 import com.haribo.business.profile.presentation.request.ProfileUpdateRequest;
+import com.haribo.business.profile.presentation.response.MentoInfoResponse;
 import com.haribo.business.profile.presentation.response.MentoProfileResponse;
 import com.haribo.business.profile.presentation.response.ProfileResponse;
 import com.haribo.business.profile.presentation.response.ReviewResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -81,8 +82,11 @@ public class ProfileServiceImpl implements ProfileService{
         }
 
         String matchingRate;
-        if(mentoRDto.getTotalCnt()==0) matchingRate = "멘토링이 한번도 이루어진적이 없어요";
-        else matchingRate = (double)mentoRDto.getMatchingRate()/ mentoRDto.getTotalCnt() +"%";
+        if(mentoNDto.getTotalCnt()==0) matchingRate = "멘토링이 한번도 이루어진적이 없어요";
+        else {
+            double matchingRateDouble = (double)mentoNDto.getMatchingRate()/ mentoNDto.getTotalCnt();
+            matchingRate = Math.round(matchingRateDouble * 100) +"%";
+        }
 
         return MentoProfileResponse.builder()
                 .profileId(profileId)
@@ -90,6 +94,7 @@ public class ProfileServiceImpl implements ProfileService{
                 .description(mentoRDto.getDescription())
                 .intro(profileRDto.getIntro())
                 .matchingRate(matchingRate)
+                .star(Math.round((double)mentoNDto.getStar()/ mentoNDto.getMatchingRate()* 100)/100.0+"")
                 .techs(mentoNDto.getTechs())
                 .times(mentoNDto.getTimes())
                 .questions(mentoNDto.getQuestions())
@@ -129,7 +134,7 @@ public class ProfileServiceImpl implements ProfileService{
 
         String profileId = profileRDto.getProfileId();
 
-        if(mentoRepository.existsByProfileId(profileId))
+        if(mentoRepository.existsByProfileId(profileId) || mongoTemplate.findOne(Query.query(Criteria.where("profileId").is(profileId)), MentoNDto.class) != null)
             throw new CustomException(CustomErrorCode.ALREADY_MENTO);
 
         if(mentoRequest.getTechs().size()>5)
@@ -139,8 +144,7 @@ public class ProfileServiceImpl implements ProfileService{
                 MentoRDto.builder()
                         .description(mentoRequest.getDescription())
                         .profileId(profileId)
-                        .matchingRate(0)
-                        .totalCnt(0)
+                        .registDate(LocalDateTime.now())
                         .build()
         );
 
@@ -150,6 +154,9 @@ public class ProfileServiceImpl implements ProfileService{
                         .times(mentoRequest.getTimes())
                         .techs(mentoRequest.getTechs())
                         .questions(mentoRequest.getQuestions())
+                        .matchingRate(0)
+                        .totalCnt(0)
+                        .star(0)
                         .build()
         );
 
@@ -161,6 +168,7 @@ public class ProfileServiceImpl implements ProfileService{
                 .profileId(profileId)
                 .times(mentoRequest.getTimes())
                 .techs(mentoRequest.getTechs())
+                .star("0")
                 .questions(mentoRequest.getQuestions())
                 .description(mentoRequest.getDescription())
                 .matchingRate("매칭 시도 횟수가 한 번도 없어여!")
@@ -169,32 +177,37 @@ public class ProfileServiceImpl implements ProfileService{
     }
 
     @Override
-    public List<Map<String, MentoInfo>> getMentoList() {
+    public List<Map<String, MentoInfoResponse>> getMentoList() {
 
-        List<Map<String, MentoInfo>> allMentoList = new ArrayList<>();
+        List<Map<String, MentoInfoResponse>> allMentoList = new ArrayList<>();
 
         List<MentoRDto> MentoRDtoRList = mentoRepository.findAll();
-        ;
+
         for(MentoRDto mentoRDto : MentoRDtoRList){
             String profileId = mentoRDto.getProfileId();
             log.debug("profileId: {}", profileId);
 
             ProfileRDto profileRDto = profileRepository.findByProfileId(profileId);
+            MentoNDto mentoNDto = mongoTemplate.findOne(Query.query(Criteria.where("profileId").is(profileId)), MentoNDto.class);
 
             String matchingRate;
-            if(mentoRDto.getTotalCnt()==0) matchingRate = "매칭 시도 횟수가 한 번도 없어여!";
-            else matchingRate = (double)mentoRDto.getMatchingRate()/ mentoRDto.getTotalCnt() +"%";
+            if(mentoNDto.getTotalCnt()==0) matchingRate = "매칭 시도 횟수가 한 번도 없어여!";
+            else {
+                double matchingRateDouble = (double)mentoNDto.getMatchingRate()/ mentoNDto.getTotalCnt();
+                matchingRate = Math.round(matchingRateDouble*100)+"%";
+            }
 
             List<Integer> techs = mongoTemplate.findOne(new Query().addCriteria(Criteria.where("profile_id").is(profileId)), MentoNDto.class).getTechs();
 
-            Map<String, MentoInfo> tmpMentoMap = new HashMap<>();
-            MentoInfo mentoInfo = MentoInfo.builder()
+            Map<String, MentoInfoResponse> tmpMentoMap = new HashMap<>();
+            MentoInfoResponse mentoInfoResponse = MentoInfoResponse.builder()
                     .intro(profileRDto.getIntro())
+                    .star(Math.round((double)mentoNDto.getStar()/ mentoNDto.getMatchingRate()*100)/100.0+"")
                     .matchingRate(matchingRate)
                     .nickName(profileRDto.getNickName())
                     .techs(techs)
                     .build();
-            tmpMentoMap.put(profileId, mentoInfo);
+            tmpMentoMap.put(profileId, mentoInfoResponse);
 
             allMentoList.add(tmpMentoMap);
         }
@@ -223,8 +236,6 @@ public class ProfileServiceImpl implements ProfileService{
                         .mentoId(mentoRDto.getMentoId())
                         .description(mentoRequest.getDescription())
                         .profileId(profileId)
-                        .matchingRate(0)
-                        .totalCnt(0)
                         .build()
         );
 
@@ -236,12 +247,37 @@ public class ProfileServiceImpl implements ProfileService{
                 .builder()
                 .id(mentoNDto.getId())
                 .profileId(profileId)
+                .totalCnt(mentoNDto.getTotalCnt())
+                .matchingRate(mentoNDto.getMatchingRate())
+                .star(mentoNDto.getStar())
                 .times(mentoRequest.getTimes())
                 .techs(mentoRequest.getTechs())
                 .questions(mentoRequest.getQuestions())
                 .build();
 
         mongoTemplate.save(tmpMentoDto);
+    }
+
+    @Override
+    public void feedbackMentoMatching(MentoMatchingRequest mentoMatchingRequest) {
+
+        String profileId = mentoMatchingRequest.getProfileId();
+        if(profileId==null) throw new CustomException(CustomErrorCode.USER_NOT_FOUND);
+
+        Query query = new Query(Criteria.where("profile_id").is(profileId));
+
+        MentoNDto mentoNDto = Objects.requireNonNull(mongoTemplate.findOne(query, MentoNDto.class));
+
+        Update update = new Update();
+        if(mentoMatchingRequest.getMatchingCompleted()) {
+            update.set("totalCnt", mentoNDto.getTotalCnt()+1);
+            update.set("matchingRate", mentoNDto.getMatchingRate()+1);
+            update.set("star", mentoNDto.getStar()+mentoMatchingRequest.getStar());
+        } else {
+            update.set("totalCnt", mentoNDto.getTotalCnt()+1);
+        }
+
+        mongoTemplate.updateFirst(query, update, MentoNDto.class);
     }
 
 }
