@@ -22,6 +22,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -133,7 +134,7 @@ public class ProfileServiceImpl implements ProfileService{
 
         String profileId = profileRDto.getProfileId();
 
-        if(mentoRepository.existsByProfileId(profileId))
+        if(mentoRepository.existsByProfileId(profileId) || mongoTemplate.findOne(Query.query(Criteria.where("profileId").is(profileId)), MentoNDto.class) != null)
             throw new CustomException(CustomErrorCode.ALREADY_MENTO);
 
         if(mentoRequest.getTechs().size()>5)
@@ -143,6 +144,7 @@ public class ProfileServiceImpl implements ProfileService{
                 MentoRDto.builder()
                         .description(mentoRequest.getDescription())
                         .profileId(profileId)
+                        .registDate(LocalDateTime.now())
                         .build()
         );
 
@@ -154,8 +156,8 @@ public class ProfileServiceImpl implements ProfileService{
                         .questions(mentoRequest.getQuestions())
                         .matchingRate(0)
                         .totalCnt(0)
-                .star(0)
-                .build()
+                        .star(0)
+                        .build()
         );
 
         log.debug("멘토 등록 완료: {}", mentoRequest);
