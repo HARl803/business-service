@@ -5,7 +5,6 @@ import com.haribo.business.profile.presentation.request.MentoMatchingRequest;
 import com.haribo.business.profile.presentation.request.MentoRequest;
 import com.haribo.business.profile.presentation.request.ProfileUpdateRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +28,7 @@ public class ProfileController {
 
         profileService.updateProfile(profileUpdateRequest);
 
-        return ResponseEntity.status(HttpStatus.OK).body("업데이트 완료");
+        return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping
@@ -48,14 +47,14 @@ public class ProfileController {
     public ResponseEntity<?> updateMento(@RequestBody MentoRequest mentoRequest) {
         profileService.updateMento(mentoRequest);
 
-        return ResponseEntity.status(HttpStatus.OK).body("업데이트 완료");
+        return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping("/mento/feedback/matching")
     public ResponseEntity<?> feedbackMentoMatching(@RequestBody MentoMatchingRequest mentoMatchingRequest) {
         profileService.feedbackMentoMatching(mentoMatchingRequest);
 
-        return ResponseEntity.status(HttpStatus.OK).body("업데이트 완료");
+        return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.NO_CONTENT);
     }
 
 }
