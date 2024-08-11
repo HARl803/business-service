@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "mentomember")
@@ -26,4 +26,8 @@ public class MentoRDto {
     @Column(name = "introduce")
     @NotNull
     private String description;
+
+    @Column(name = "regist_date")
+    @NotNull
+    private LocalDateTime registDate;
 }
