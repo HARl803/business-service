@@ -29,7 +29,7 @@ public class ProfileController {
 
         profileService.updateProfile(profileUpdateRequest);
 
-        return ResponseEntity.status(HttpStatus.OK).body("업데이트 완료");
+        return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping
@@ -48,14 +48,14 @@ public class ProfileController {
     public ResponseEntity<?> updateMento(@RequestBody MentoRequest mentoRequest) {
         profileService.updateMento(mentoRequest);
 
-        return ResponseEntity.status(HttpStatus.OK).body("업데이트 완료");
+        return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping("/mento/feedback/matching")
     public ResponseEntity<?> feedbackMentoMatching(@RequestBody MentoMatchingRequest mentoMatchingRequest) {
         profileService.feedbackMentoMatching(mentoMatchingRequest);
 
-        return ResponseEntity.status(HttpStatus.OK).body("업데이트 완료");
+        return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.NO_CONTENT);
     }
 
 }
