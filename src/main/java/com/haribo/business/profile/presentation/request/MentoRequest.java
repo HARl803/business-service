@@ -8,8 +8,6 @@ import java.util.List;
 @Builder
 public class MentoRequest {
 
-    private String profileId;
-
     private String description;
 
     private List<Long> times;

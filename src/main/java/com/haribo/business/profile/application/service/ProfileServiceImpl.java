@@ -39,9 +39,6 @@ public class ProfileServiceImpl implements ProfileService{
     public ProfileResponse getProfile(String profileId) {
         ProfileRDto profileRDto = profileRepository.findByProfileId(profileId);
 
-        // 유저 없을 때
-        if(profileRDto == null) throw new CustomException(CustomErrorCode.USER_NOT_FOUND);
-
         MentoNDto mentoNDto = mongoTemplate.findOne(Query.query(Criteria.where("profileId").is(profileId)), MentoNDto.class);
         if(mentoNDto == null) {
             return ProfileResponse.builder()
@@ -103,10 +100,8 @@ public class ProfileServiceImpl implements ProfileService{
 
     @Override
     @Transactional
-    public void updateProfile(ProfileUpdateRequest profileUpdateRequest) {
-        ProfileRDto profileRDto = profileRepository.findByProfileId(profileUpdateRequest.getProfileId());
-
-        if(profileRDto==null) throw new CustomException(CustomErrorCode.USER_NOT_FOUND);
+    public void updateProfile(ProfileUpdateRequest profileUpdateRequest, String profileId) {
+        ProfileRDto profileRDto = profileRepository.findByProfileId(profileId);
 
         profileRDto = ProfileRDto.builder()
                 .profileId(profileRDto.getProfileId())
@@ -126,12 +121,8 @@ public class ProfileServiceImpl implements ProfileService{
 
     @Override
     @Transactional
-    public MentoProfileResponse registMento(MentoRequest mentoRequest) {
-        ProfileRDto profileRDto = profileRepository.findByProfileId(mentoRequest.getProfileId());
-
-        if(profileRDto==null) throw new CustomException(CustomErrorCode.USER_NOT_FOUND);
-
-        String profileId = profileRDto.getProfileId();
+    public MentoProfileResponse registMento(MentoRequest mentoRequest, String profileId) {
+        ProfileRDto profileRDto = profileRepository.findByProfileId(profileId);
 
         if(mentoRepository.existsByProfileId(profileId))
             throw new CustomException(CustomErrorCode.ALREADY_MENTO);
@@ -215,9 +206,8 @@ public class ProfileServiceImpl implements ProfileService{
 
     @Override
     @Transactional
-    public void updateMento(MentoRequest mentoRequest) {
+    public void updateMento(MentoRequest mentoRequest, String profileId) {
 
-        String profileId = mentoRequest.getProfileId();
         ProfileRDto profileRDto = profileRepository.findByProfileId(profileId);
 
         if(profileRDto==null) throw new CustomException(CustomErrorCode.USER_NOT_FOUND);
@@ -257,10 +247,7 @@ public class ProfileServiceImpl implements ProfileService{
     }
 
     @Override
-    public void feedbackMentoMatching(MentoMatchingRequest mentoMatchingRequest) {
-
-        String profileId = mentoMatchingRequest.getProfileId();
-        if(profileId==null) throw new CustomException(CustomErrorCode.USER_NOT_FOUND);
+    public void feedbackMentoMatching(MentoMatchingRequest mentoMatchingRequest, String profileId) {
 
         Query query = new Query(Criteria.where("profile_id").is(profileId));
 

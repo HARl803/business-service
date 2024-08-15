@@ -14,6 +14,6 @@ public interface MentoRepository extends JpaRepository<MentoRDto, String> {
     boolean existsByProfileId(String profileId);
     MentoRDto findByProfileId(String profileId);
 
-    @Query(value = "SELECT * FROM mentomember ORDER BY regist_date DESC LIMIT 3", nativeQuery = true)
+    @Query(value = "SELECT * FROM mento_member ORDER BY regist_date DESC LIMIT 3", nativeQuery = true)
     List<MentoRDto> findTop3ByOrderByregistDatetDesc();
 }

@@ -21,7 +21,12 @@ public enum CustomErrorCode {
     USER_NOT_MENTO("멘토가 아닌 유저입니다.", HttpStatus.NOT_FOUND),
 
     // 이미 멘토
-    ALREADY_MENTO("이미 멘토인 유저입니다.", HttpStatus.BAD_REQUEST);
+    ALREADY_MENTO("이미 멘토인 유저입니다.", HttpStatus.BAD_REQUEST),
+
+    // 존재하지 않는 파츠
+    PART_NOT_FOUND("존재하지 않는 파츠입니다", HttpStatus.NOT_FOUND),
+
+    ;
 
     private final String statusMessage;
     private final HttpStatus status;

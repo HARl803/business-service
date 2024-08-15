@@ -1,5 +1,6 @@
 package com.haribo.business.profile.presentation;
 
+import com.haribo.business.common.auth.AuthService;
 import com.haribo.business.profile.application.service.ProfileService;
 import com.haribo.business.profile.presentation.request.MentoMatchingRequest;
 import com.haribo.business.profile.presentation.request.MentoRequest;
@@ -9,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URISyntaxException;
+import java.util.LinkedHashMap;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -16,25 +20,37 @@ import org.springframework.web.bind.annotation.*;
 public class ProfileController {
 
     private final ProfileService profileService;
+    private final AuthService authService;
 
-    @GetMapping("/{profileId}")
-    public ResponseEntity<?> getProfile(@PathVariable String profileId) {
+    @GetMapping
+    public ResponseEntity<?> getProfile (@CookieValue("JSESSIONID") String sessionId)
+            throws URISyntaxException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(profileService.getProfile(profileId));
+        LinkedHashMap<String, String> profile = authService.authorizedProfileId(sessionId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(profileService.getProfile(profile.get("profileId")));
     }
 
     @PatchMapping
-    public ResponseEntity<?> updateProfile(@RequestBody ProfileUpdateRequest profileUpdateRequest) {
+    public ResponseEntity<?> updateProfile(@RequestBody ProfileUpdateRequest profileUpdateRequest,
+                                           @CookieValue("JSESSIONID") String sessionId)
+            throws URISyntaxException {
 
-        profileService.updateProfile(profileUpdateRequest);
+        LinkedHashMap<String, String> profile = authService.authorizedProfileId(sessionId);
+
+        profileService.updateProfile(profileUpdateRequest, profile.get("profileId"));
 
         return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping
-    public ResponseEntity<?> registMento(@RequestBody MentoRequest mentoRequest) {
+    public ResponseEntity<?> registMento(@RequestBody MentoRequest mentoRequest,
+                                         @CookieValue("JSESSIONID") String sessionId)
+            throws URISyntaxException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(profileService.registMento(mentoRequest));
+        LinkedHashMap<String, String> profile = authService.authorizedProfileId(sessionId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(profileService.registMento(mentoRequest, profile.get("profileId")));
     }
 
     @GetMapping
@@ -44,17 +60,27 @@ public class ProfileController {
     }
 
     @PatchMapping("/mento")
-    public ResponseEntity<?> updateMento(@RequestBody MentoRequest mentoRequest) {
-        profileService.updateMento(mentoRequest);
+    public ResponseEntity<?> updateMento(@RequestBody MentoRequest mentoRequest,
+                                         @CookieValue("JSESSIONID") String sessionId)
+            throws URISyntaxException {
 
-        return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.NO_CONTENT);
+        LinkedHashMap<String, String> profile = authService.authorizedProfileId(sessionId);
+
+        profileService.updateMento(mentoRequest, profile.get("profileId"));
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PatchMapping("/mento/feedback/matching")
-    public ResponseEntity<?> feedbackMentoMatching(@RequestBody MentoMatchingRequest mentoMatchingRequest) {
-        profileService.feedbackMentoMatching(mentoMatchingRequest);
+    public ResponseEntity<?> feedbackMentoMatching(@RequestBody MentoMatchingRequest mentoMatchingRequest,
+                                                   @CookieValue("JSESSIONID") String sessionId)
+            throws URISyntaxException {
 
-        return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.NO_CONTENT);
+        LinkedHashMap<String, String> profile = authService.authorizedProfileId(sessionId);
+
+        profileService.feedbackMentoMatching(mentoMatchingRequest,profile.get("profileId"));
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

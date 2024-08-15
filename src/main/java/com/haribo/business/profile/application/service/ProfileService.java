@@ -11,11 +11,11 @@ import java.util.Map;
 
 public interface ProfileService {
     ProfileResponse getProfile(String profileId);
-    void updateProfile(ProfileUpdateRequest profileUpdateRequest);
+    void updateProfile(ProfileUpdateRequest profileUpdateRequest, String profileId);
 
-    ProfileResponse registMento(MentoRequest mentoRequest);
+    ProfileResponse registMento(MentoRequest mentoRequest, String profileId);
     List<Map<String, MentoInfoResponse>> getMentoList();
-    void updateMento(MentoRequest mentoRequest);
+    void updateMento(MentoRequest mentoRequest, String profileId);
 
-    void feedbackMentoMatching(MentoMatchingRequest mentoMatchingRequest);
+    void feedbackMentoMatching(MentoMatchingRequest mentoMatchingRequest, String profileId);
 }

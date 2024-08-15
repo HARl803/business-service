@@ -6,8 +6,6 @@ import lombok.Getter;
 @Builder
 public class ProfileUpdateRequest {
 
-    private String profileId;
-
     private String nickName;
 
     private String intro;

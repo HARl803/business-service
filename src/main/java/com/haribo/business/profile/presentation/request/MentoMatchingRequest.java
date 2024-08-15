@@ -7,8 +7,6 @@ import lombok.Getter;
 @Builder
 public class MentoMatchingRequest {
 
-    private String profileId;
-
     private Boolean matchingCompleted;
 
     private int star;
